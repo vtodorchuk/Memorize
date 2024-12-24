@@ -9,10 +9,11 @@ import SwiftUI
 
 struct ContentView: View {
     @State var emojies = ["🐶", "🐶", "🐱", "🐱", "🐭", "🐭", "🐹", "🐹", "🐰", "🐰", "🦊", "🦊", "🐻", "🐻", "🐼", "🐼"]
+    @State var selectedTheme = "animals"
     
     var body: some View {
         VStack {
-           Text("Memorize Game")
+           Text("Memorize!")
                 .font(.title)
                 .bold()
             
@@ -25,7 +26,7 @@ struct ContentView: View {
                 }
             }
             
-            HStack(spacing: 25) {
+            HStack {
                 animalsButton
                 sportsButton
                 carsView
@@ -38,15 +39,73 @@ struct ContentView: View {
     }
     
     var animalsButton: some View {
-        Button("Animals") { emojies = ["🐶", "🐶", "🐱", "🐱", "🐭", "🐭", "🐹", "🐹", "🐰", "🐰", "🦊", "🦊", "🐻", "🐻", "🐼", "🐼"].shuffled() }
+        Button {
+            emojies = ["🐶", "🐶", "🐱", "🐱", "🐭", "🐭", "🐹", "🐹", "🐰", "🐰", "🦊", "🦊", "🐻", "🐻", "🐼", "🐼"].shuffled()
+            selectedTheme = "animals"
+        } label: {
+            let base = RoundedRectangle(cornerRadius: 12)
+            
+            base
+                .stroke(lineWidth: 2)
+                .frame(width: 120, height: 40)
+                .overlay {
+                    HStack {
+                        Image(systemName: "hare.fill")
+                        Text("Animals")
+                    }
+                    .foregroundStyle(selectedTheme == "animals" ? .white : .blue)
+                }
+                .background {
+                    base.fill(selectedTheme == "animals" ? .blue : .white)
+                }
+            
+        }
     }
     
     var sportsButton: some View {
-        Button("Sports") { emojies = ["⚽️", "⚽️", "🏀", "🏀", "🏈", "🏈", "⚾️", "⚾️", "🥎", "🥎", "🎾", "🎾", "🏐", "🏐", "🏉", "🏉"].shuffled() }
+        Button {
+            emojies = ["⚽️", "⚽️", "🏀", "🏀", "🏈", "🏈", "⚾️", "⚾️", "🥎", "🥎", "🎾", "🎾", "🏐", "🏐", "🏉", "🏉"].shuffled()
+            selectedTheme = "sports"
+        } label: {
+            let base = RoundedRectangle(cornerRadius: 12)
+            
+            base
+                .stroke(lineWidth: 2)
+                .frame(width: 120, height: 40)
+                .overlay {
+                    HStack {
+                        Image(systemName: "figure.run")
+                        Text("Sports")
+                    }
+                    .foregroundStyle(selectedTheme == "sports" ? .white : .blue)
+                }
+                .background {
+                    base.fill(selectedTheme == "sports" ? .blue : .white)
+                }
+        }
     }
     
     var carsView: some View {
-        Button("Cars") { emojies = ["🚗", "🚗", "🚙", "🚙", "🏎️", "🏎️", "🚕", "🚕", "🚓", "🚓", "🚘", "🚘", "🚖", "🚖", "🚔", "🚔"].shuffled() }
+        Button {
+            emojies = ["🚗", "🚗", "🚙", "🚙", "🏎️", "🏎️", "🚕", "🚕", "🚓", "🚓", "🚘", "🚘", "🚖", "🚖", "🚔", "🚔"].shuffled()
+            selectedTheme = "cars"
+        } label: {
+            let base = RoundedRectangle(cornerRadius: 12)
+            
+            base
+                .stroke(lineWidth: 2)
+                .frame(width: 120, height: 40)
+                .overlay {
+                    HStack {
+                        Image(systemName: "car.rear.fill")
+                        Text("Cars")
+                    }
+                    .foregroundStyle(selectedTheme == "cars" ? .white : .blue)
+                }
+                .background {
+                    base.fill(selectedTheme == "cars" ? .blue : .white)
+                }
+        }
     }
 }
 

@@ -16,13 +16,13 @@ struct CardView: View {
             let base = RoundedRectangle(cornerRadius: 12)
             
             Group {
-                base.fill(isFaceUp ? .white : .orange)
-                base.stroke(lineWidth: 2).foregroundStyle(.orange)
+                base.fill(isFaceUp ? .white : .blue)
+                base.stroke(lineWidth: 2).foregroundStyle(.blue)
                 Text(symbol)
             }
             .opacity(isFaceUp ? 1 : 0)
             
-            base.fill(.orange).opacity(isFaceUp ? 0 : 1)
+            base.fill(.blue).opacity(isFaceUp ? 0 : 1)
         }
         .onTapGesture {
             withAnimation {
