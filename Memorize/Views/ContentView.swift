@@ -8,35 +8,45 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        HStack {
-            CardView(isFaceUp: true)
-            CardView(isFaceUp: false)
-            CardView(isFaceUp: false)
-            CardView(isFaceUp: false)
-        }
-        .padding()
-    }
-}
-
-struct CardView: View {
-    @State var isFaceUp = false
-    var symbol = "🙈"
+    @State var emojies = ["🐶", "🐶", "🐱", "🐱", "🐭", "🐭", "🐹", "🐹", "🐰", "🐰", "🦊", "🦊", "🐻", "🐻", "🐼", "🐼"]
     
     var body: some View {
-        ZStack {
-            let base = RoundedRectangle(cornerRadius: 12)
+        VStack {
+           Text("Memorize Game")
+                .font(.title)
+                .bold()
             
-            base.fill(isFaceUp ? .white : .orange)
-            base.stroke(lineWidth: 2).foregroundStyle(.orange)
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80, maximum: 240))]) {
+                    ForEach(emojies.indices, id: \.self) { index in
+                        CardView(symbol: emojies[index])
+                            .aspectRatio(2/3, contentMode: .fit)
+                    }
+                }
+            }
             
-            if isFaceUp { Text(symbol) }
-        }
-        .onTapGesture {
-            withAnimation {
-                isFaceUp.toggle()
+            HStack(spacing: 25) {
+                animalsButton
+                sportsButton
+                carsView
             }
         }
+        .padding()
+        .onAppear() {
+            emojies.shuffle()
+        }
+    }
+    
+    var animalsButton: some View {
+        Button("Animals") { emojies = ["🐶", "🐶", "🐱", "🐱", "🐭", "🐭", "🐹", "🐹", "🐰", "🐰", "🦊", "🦊", "🐻", "🐻", "🐼", "🐼"].shuffled() }
+    }
+    
+    var sportsButton: some View {
+        Button("Sports") { emojies = ["⚽️", "⚽️", "🏀", "🏀", "🏈", "🏈", "⚾️", "⚾️", "🥎", "🥎", "🎾", "🎾", "🏐", "🏐", "🏉", "🏉"].shuffled() }
+    }
+    
+    var carsView: some View {
+        Button("Cars") { emojies = ["🚗", "🚗", "🚙", "🚙", "🏎️", "🏎️", "🚕", "🚕", "🚓", "🚓", "🚘", "🚘", "🚖", "🚖", "🚔", "🚔"].shuffled() }
     }
 }
 
