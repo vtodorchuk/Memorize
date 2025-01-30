@@ -8,107 +8,79 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var emojies = ["🐶", "🐶", "🐱", "🐱", "🐭", "🐭", "🐹", "🐹", "🐰", "🐰", "🦊", "🦊", "🐻", "🐻", "🐼", "🐼"]
-    @State var selectedTheme = "animals"
+    typealias Card = MemorizeGame<String>.Card
+    @ObservedObject var viewModel: MemorizeViewModal
+    
+    private let asAspecRatio: CGFloat = 2/3
     
     var body: some View {
         VStack {
-           Text("Memorize!")
+            Text("Memorize!")
                 .font(.title)
                 .bold()
             
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80, maximum: 240))]) {
-                    ForEach(emojies.indices, id: \.self) { index in
-                        CardView(symbol: emojies[index])
-                            .aspectRatio(2/3, contentMode: .fit)
+            AspectVGrid(items: viewModel.cards, asAspecRatio: asAspecRatio) { card in
+                CardView(card: card)
+                    .padding(4)
+                    .overlay(FlyingNumberView(number: calculateScore(card: card)))
+                    .zIndex(calculateScore(card: card) != 0 ? 1 : 0)
+                    .onTapGesture {
+                        withAnimation {
+                            let scoreChangeBefore = viewModel.score
+                            viewModel.choose(card)
+                            let scoreChange = viewModel.score - scoreChangeBefore
+                            lastScoreChange = (scoreChange, causedCardId: card.id)
+                        }
                     }
-                }
             }
             
+            Text("Score: \(viewModel.score)")
+            
             HStack {
-                animalsButton
-                sportsButton
-                carsView
+                ActionButtonView(viewModel: viewModel, theme: .animals, systemName: "hare.fill")
+                ActionButtonView(viewModel: viewModel, theme: .sports, systemName: "figure.run")
+                ActionButtonView(viewModel: viewModel, theme: .cars, systemName: "car.fill")
             }
         }
         .padding()
-        .onAppear() {
-            emojies.shuffle()
-        }
+        .onAppear() { viewModel.shuffle() }
     }
     
-    var animalsButton: some View {
-        Button {
-            emojies = ["🐶", "🐶", "🐱", "🐱", "🐭", "🐭", "🐹", "🐹", "🐰", "🐰", "🦊", "🦊", "🐻", "🐻", "🐼", "🐼"].shuffled()
-            selectedTheme = "animals"
-        } label: {
-            let base = RoundedRectangle(cornerRadius: 12)
-            
-            base
-                .stroke(lineWidth: 2)
-                .frame(width: 120, height: 40)
-                .overlay {
-                    HStack {
-                        Image(systemName: "hare.fill")
-                        Text("Animals")
-                    }
-                    .foregroundStyle(selectedTheme == "animals" ? .white : .blue)
-                }
-                .background {
-                    base.fill(selectedTheme == "animals" ? .blue : .white)
-                }
-            
-        }
+    @State private var lastScoreChange = (0, causedCardId: "")
+      
+    func calculateScore(card: Card) -> Int {
+        let (amount, id) = lastScoreChange
+         
+        return card.id == id ? amount : 0
     }
+}
+  
+struct FlyingNumberView: View {
     
-    var sportsButton: some View {
-        Button {
-            emojies = ["⚽️", "⚽️", "🏀", "🏀", "🏈", "🏈", "⚾️", "⚾️", "🥎", "🥎", "🎾", "🎾", "🏐", "🏐", "🏉", "🏉"].shuffled()
-            selectedTheme = "sports"
-        } label: {
-            let base = RoundedRectangle(cornerRadius: 12)
-            
-            base
-                .stroke(lineWidth: 2)
-                .frame(width: 120, height: 40)
-                .overlay {
-                    HStack {
-                        Image(systemName: "figure.run")
-                        Text("Sports")
-                    }
-                    .foregroundStyle(selectedTheme == "sports" ? .white : .blue)
-                }
-                .background {
-                    base.fill(selectedTheme == "sports" ? .blue : .white)
-                }
-        }
-    }
+    @State private var offset: CGFloat = 0
     
-    var carsView: some View {
-        Button {
-            emojies = ["🚗", "🚗", "🚙", "🚙", "🏎️", "🏎️", "🚕", "🚕", "🚓", "🚓", "🚘", "🚘", "🚖", "🚖", "🚔", "🚔"].shuffled()
-            selectedTheme = "cars"
-        } label: {
-            let base = RoundedRectangle(cornerRadius: 12)
-            
-            base
-                .stroke(lineWidth: 2)
-                .frame(width: 120, height: 40)
-                .overlay {
-                    HStack {
-                        Image(systemName: "car.rear.fill")
-                        Text("Cars")
+    let number: Int
+      
+    var body: some View {
+        if number != 0 {
+            Text(number, format: .number.sign(strategy: .always()))
+                .font(.largeTitle)
+                .foregroundStyle(number < 0 ? .red : .green)
+                .shadow(color: .black, radius: 1.5, x: 1, y: 1)
+                .offset(x: 0, y: offset)
+                .opacity(offset != 0 ? 0 : 1)
+                .onAppear {
+                    withAnimation(.easeIn(duration: 1.5)) {
+                        offset = number < 0 ? 200 : -200
                     }
-                    .foregroundStyle(selectedTheme == "cars" ? .white : .blue)
                 }
-                .background {
-                    base.fill(selectedTheme == "cars" ? .blue : .white)
+                .onDisappear {
+                    offset = 0
                 }
         }
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(viewModel: MemorizeViewModal())
 }

@@ -9,12 +9,14 @@ import SwiftUI
 
 struct ActionButtonView: View {
     @ObservedObject var viewModel: MemorizeViewModal
-    var theme: String
+    var theme: Theme
     var systemName: String
     
     var body: some View {
         Button {
-            viewModel.changeTheme(theme)
+            withAnimation {
+                viewModel.changeTheme(theme)
+            }
         } label: {
             let base = RoundedRectangle(cornerRadius: 12)
             
@@ -24,7 +26,7 @@ struct ActionButtonView: View {
                 .overlay {
                     HStack {
                         Image(systemName: systemName)
-                        Text(theme.capitalized)
+                        Text(theme.rawValue)
                     }
                     .foregroundStyle(viewModel.selectedTheme == theme ? .white : .blue)
                 }
@@ -37,5 +39,5 @@ struct ActionButtonView: View {
 }
 
 #Preview {
-    ActionButtonView(viewModel: MemorizeViewModal(), theme: "animals", systemName: "hare.fill")
+    ActionButtonView(viewModel: MemorizeViewModal(), theme: .animals, systemName: "hare.fill")
 }

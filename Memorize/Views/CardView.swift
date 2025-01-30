@@ -8,30 +8,33 @@
 import SwiftUI
 
 struct CardView: View {
-    @State var isFaceUp = false
-    var symbol = "🙈"
+    var card: MemorizeGame<String>.Card
     
     var body: some View {
-        ZStack {
-            let base = RoundedRectangle(cornerRadius: 12)
-            
-            Group {
-                base.fill(isFaceUp ? .white : .blue)
-                base.stroke(lineWidth: 2).foregroundStyle(.blue)
-                Text(symbol)
-            }
-            .opacity(isFaceUp ? 1 : 0)
-            
-            base.fill(.blue).opacity(isFaceUp ? 0 : 1)
-        }
-        .onTapGesture {
-            withAnimation {
-                isFaceUp.toggle()
+        TimelineView(.animation) { timeline in
+            if card.isFaceUp || !card.isMatched {
+                Pie(endAngle: .degrees(card.bonusPercentRemaining *  360))
+                    .fill(.blue)
+                    .opacity(0.5)
+                    .overlay(cardContent.padding(5))
+                    .padding(5)
+                    .cardify(isFaceUp: card.isFaceUp)
+            } else {
+                Color.clear
             }
         }
+    }
+    
+    var cardContent: some View {
+        Text(card.content)
+            .font(.system(size: 200))
+            .minimumScaleFactor(0.01)
+            .aspectRatio(1, contentMode: .fit)
+            .rotationEffect(.degrees(card.isMatched ? 360 : 0))
+            .animation(.easeInOut(duration: 2), value: card.isMatched)
     }
 }
 
 #Preview {
-    CardView()
+    CardView(card: MemorizeGame<String>.Card(isFaceUp: true, isMatched: false, content: "⚡️", id: "1a"))
 }
